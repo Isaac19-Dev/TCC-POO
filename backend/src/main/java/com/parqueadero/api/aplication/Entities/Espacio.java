@@ -1,9 +1,21 @@
-package com.parqueadero.api.aplication.Entities; // Define el paquete Entities
-import jakarta.persistence.*; // Anotaciones de BD
-import lombok.*; // Lombok getters/setters
+package com.parqueadero.api.aplication.Entities;
 
-@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor @Entity @Table(name="espacios") // Crea tabla 'espacios' y métodos lombok
-public class Espacio { // Entidad que representa físicamente un cajón de parqueo en el local (ej. A1, A2)
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; // Clave primaria del espacio, se autoasigna 1, 2, 3...
-    @Column(nullable=false, unique=true, length=10) private String codigo; // Columna con el código o nombre del espacio (Ej: "A1", "A2"). Es único.
+import jakarta.persistence.*;
+import lombok.*;
+
+/**
+ * Entidad que representa la tabla 'espacios' en la base de datos.
+ * Define la cantidad física de puestos de aparcamiento en el local.
+ */
+@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor 
+@Entity @Table(name="espacios")
+public class Espacio {
+    
+    // Identificador primario
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) 
+    private Long id; 
+    
+    // Nombre visible del espacio (ej. "A1", "A2")
+    @Column(nullable=false, unique=true, length=10) 
+    private String codigo; 
 }

@@ -1,17 +1,49 @@
-package com.parqueadero.api.aplication.Entities; // Define el paquete Entities de la base de datos
-import jakarta.persistence.*; // Importa JPA (Java Persistence API) para mapear a base de datos
-import lombok.*; // Importa Lombok (generación de getters/setters/constructores automáticos)
-import java.time.LocalDateTime; // Importa manejo de tiempo
+package com.parqueadero.api.aplication.Entities;
 
-@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor @Entity @Table(name="parqueos") // Anotaciones Lombok y JPA para definir la tabla 'parqueos'
-public class Parqueo { // Entidad principal del sistema que registra el historial
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) private Long id; // Define la clave primaria (ID) autoincremental de la tabla parqueos
-    @ManyToOne(optional=false) @JoinColumn(name="vehiculo_id", nullable=false) private Vehiculo vehiculo; // Relación de cardinalidad Muchos-a-Uno con la tabla 'vehiculos' (llave foránea)
-    @ManyToOne @JoinColumn(name="espacio_id") private Espacio espacio; // Relación de cardinalidad Muchos-a-Uno con la tabla 'espacios' (para saber dónde parqueó)
-    @Column(nullable=false) private LocalDateTime fechaEntrada; // Columna 'fecha_entrada', obligatoria, para guardar la hora de ingreso
-    private LocalDateTime fechaSalida; // Columna opcional 'fecha_salida' que se llena cuando el usuario se retira
-    @Column(nullable=false) private long horas; // Columna para registrar cuántas horas duró parqueado
-    @Column(nullable=false) private long total; // Columna para registrar el costo total a pagar (dinero)
-    @Enumerated(EnumType.STRING) @Column(nullable=false) private EstadoParqueo estado; // Columna enumerada (ACTIVO o FINALIZADO) guardada como texto (STRING)
-    @Column(nullable=false) private String registradoPor; // Columna para saber quién (usuario) operó el registro
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
+
+/**
+ * Entidad que representa la tabla 'parqueos' en base de datos.
+ * Registra cada vez que un vehículo entra o sale, como una bitácora o recibo de pago.
+ */
+@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor 
+@Entity @Table(name="parqueos")
+public class Parqueo {
+    
+    // Identificador único (Primary Key)
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) 
+    private Long id; 
+    
+    // Relación al vehículo que ocupa la plaza (Llave foránea obligatoria)
+    @ManyToOne(optional=false) @JoinColumn(name="vehiculo_id", nullable=false) 
+    private Vehiculo vehiculo; 
+    
+    // Relación a la plaza física (A1, A2, etc.)
+    @ManyToOne @JoinColumn(name="espacio_id") 
+    private Espacio espacio; 
+    
+    // Fecha y hora del momento exacto del ingreso
+    @Column(nullable=false) 
+    private LocalDateTime fechaEntrada; 
+    
+    // Fecha y hora del momento exacto del retiro
+    private LocalDateTime fechaSalida; 
+    
+    // Cantidad de horas a cobrar (calculado matemáticamente)
+    @Column(nullable=false) 
+    private long horas; 
+    
+    // Total de dinero a pagar
+    @Column(nullable=false) 
+    private long total; 
+    
+    // Estado del ticket: ACTIVO (sigue dentro) o FINALIZADO (ya pagó y salió)
+    @Enumerated(EnumType.STRING) @Column(nullable=false) 
+    private EstadoParqueo estado; 
+    
+    // Quién (usuario/admin) operó el registro
+    @Column(nullable=false) 
+    private String registradoPor; 
 }

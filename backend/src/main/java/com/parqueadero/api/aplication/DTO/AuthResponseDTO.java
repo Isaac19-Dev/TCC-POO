@@ -1,2 +1,10 @@
-package com.parqueadero.api.aplication.DTO; // Paquete para objetos de transferencia de datos
-public record AuthResponseDTO(String token) {} // 'record' es una estructura inmutable en Java. Aquí sirve para empaquetar el string de 'token' y enviarlo como un JSON plano ({"token": "..."}) al cliente.
+package com.parqueadero.api.aplication.DTO;
+
+/**
+ * Record inmutable de transferencia de datos.
+ * Sirve para enviar al frontend la respuesta de inicio de sesión de forma segura y estructurada como JSON.
+ */
+public record AuthResponseDTO(
+    // Contiene el String del Token que el usuario usará en las siguientes peticiones
+    String token
+) {}

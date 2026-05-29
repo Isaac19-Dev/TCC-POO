@@ -1,31 +1,70 @@
-package com.parqueadero.api.aplication.Controller; // Paquete de los controladores
-import com.parqueadero.api.aplication.Entities.Parqueo; // Importa la entidad Parqueo
-import com.parqueadero.api.aplication.DTO.EspacioDTO; // Importa el DTO de espacios
-import com.parqueadero.api.aplication.Request.EntradaReq; // Importa el objeto de petición para registrar entrada
-import com.parqueadero.api.aplication.Service.IParqueoService; // Importa el servicio que contiene la lógica de negocio de parqueos
-import java.util.List; // Importa List
-import org.springframework.http.*; // Importa clases para manejo HTTP
-import org.springframework.web.bind.annotation.*; // Importa anotaciones web (GET, POST, etc.)
+package com.parqueadero.api.aplication.Controller;
 
-@RestController @RequestMapping("/parqueos") // Define la clase como controlador REST en la ruta "/parqueos"
-public class ParqueoController { // Controlador principal para gestionar ingresos y salidas de vehículos
-    private final IParqueoService ps; // Servicio inyectado
-    public ParqueoController(IParqueoService ps) { this.ps = ps; } // Constructor para inyectar IParqueoService
+import com.parqueadero.api.aplication.Entities.Parqueo;
+import com.parqueadero.api.aplication.DTO.EspacioDTO;
+import com.parqueadero.api.aplication.Request.EntradaReq;
+import com.parqueadero.api.aplication.Service.IParqueoService;
+import java.util.List;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
-    @GetMapping // Endpoint GET a "/parqueos"
-    public ResponseEntity<List<Parqueo>> listar() { return ResponseEntity.ok(ps.listar()); } // Devuelve todo el historial de parqueos
+/**
+ * Controlador REST encargado de gestionar los ingresos y salidas del parqueadero.
+ * Expone la API en la ruta "/parqueos".
+ */
+@RestController 
+@RequestMapping("/parqueos")
+public class ParqueoController {
     
-    @GetMapping("/activos") // Endpoint GET a "/parqueos/activos"
-    public ResponseEntity<List<Parqueo>> listarActivos() { return ResponseEntity.ok(ps.listarActivos()); } // Devuelve solo los vehículos actualmente en el parqueadero
-    
-    @GetMapping("/espacios") // Endpoint GET a "/parqueos/espacios"
-    public ResponseEntity<List<EspacioDTO>> listarEspacios() { return ResponseEntity.ok(ps.listarEspacios()); } // Devuelve el estado (libre/ocupado) de los 5 espacios fijos
-    
-    @PostMapping("/entrada") // Endpoint POST a "/parqueos/entrada"
-    public ResponseEntity<Parqueo> entrada(@RequestBody EntradaReq req, @RequestHeader(value="Authorization", defaultValue="User") String user) { // Recibe el ID del vehículo, espacio, y el usuario desde los Headers HTTP
-        return new ResponseEntity<>(ps.registrarEntrada(req.vehiculoId(), req.espacioId(), user), HttpStatus.CREATED); // Llama al servicio para registrar la entrada y devuelve 201 CREATED
+    // Dependencia que contiene la lógica del negocio
+    private final IParqueoService ps; 
+
+    /**
+     * Constructor que inyecta el servicio de parqueo.
+     */
+    public ParqueoController(IParqueoService ps) { 
+        this.ps = ps; 
+    }
+
+    /**
+     * Devuelve el historial completo de todos los parqueos registrados.
+     */
+    @GetMapping
+    public ResponseEntity<List<Parqueo>> listar() { 
+        // Retorna HTTP 200 OK con la lista de parqueos
+        return ResponseEntity.ok(ps.listar()); 
     }
     
-    @PostMapping("/{id}/salida") // Endpoint POST a "/parqueos/{id}/salida" donde {id} es una variable dinámica en la URL
-    public ResponseEntity<Parqueo> salida(@PathVariable Long id) { return ResponseEntity.ok(ps.registrarSalida(id)); } // Registra la salida, calcula horas y costo total, devolviendo 200 OK
+    /**
+     * Devuelve únicamente los parqueos que están activos en este momento (sin salir).
+     */
+    @GetMapping("/activos")
+    public ResponseEntity<List<Parqueo>> listarActivos() { 
+        return ResponseEntity.ok(ps.listarActivos()); 
+    }
+    
+    /**
+     * Devuelve la lista de los 5 espacios fijos indicando si están libres u ocupados.
+     */
+    @GetMapping("/espacios")
+    public ResponseEntity<List<EspacioDTO>> listarEspacios() { 
+        return ResponseEntity.ok(ps.listarEspacios()); 
+    }
+    
+    /**
+     * Registra la entrada de un vehículo al parqueadero.
+     */
+    @PostMapping("/entrada")
+    public ResponseEntity<Parqueo> entrada(@RequestBody EntradaReq req, @RequestHeader(value="Authorization", defaultValue="User") String user) { 
+        // Llama al servicio con los datos y devuelve HTTP 201 Created
+        return new ResponseEntity<>(ps.registrarEntrada(req.vehiculoId(), req.espacioId(), user), HttpStatus.CREATED); 
+    }
+    
+    /**
+     * Registra la salida de un vehículo, calculando el total a pagar.
+     */
+    @PostMapping("/{id}/salida")
+    public ResponseEntity<Parqueo> salida(@PathVariable Long id) { 
+        return ResponseEntity.ok(ps.registrarSalida(id)); 
+    }
 }

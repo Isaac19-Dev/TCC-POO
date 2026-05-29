@@ -1,2 +1,11 @@
-package com.parqueadero.api.aplication.Entities; // Paquete Entities
-public enum TipoVehiculo { CARRO, MOTO } // Tipo de enumeración. Sirve para diferenciar el cobro según el tipo de vehículo
+package com.parqueadero.api.aplication.Entities;
+
+/**
+ * Enumeración para clasificar los vehículos, lo cual afecta el cobro (tarifa).
+ */
+public enum TipoVehiculo { 
+    // Vehículo tipo carro, paga más
+    CARRO, 
+    // Vehículo tipo motocicleta, paga menos
+    MOTO 
+}

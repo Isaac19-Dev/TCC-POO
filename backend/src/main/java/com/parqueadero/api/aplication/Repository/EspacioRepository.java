@@ -1,4 +1,12 @@
-package com.parqueadero.api.aplication.Repository; // Paquete repositorio
-import com.parqueadero.api.aplication.Entities.Espacio; // Importa Entidad
-import org.springframework.data.jpa.repository.JpaRepository; // Interfaz base de JPA Spring
-public interface EspacioRepository extends JpaRepository<Espacio, Long> {} // Interfaz que hereda de JpaRepository. Spring Boot la implementa automáticamente en memoria. Permite usar funciones como save(), findAll(), findById() sobre la tabla de 'espacios'.
+package com.parqueadero.api.aplication.Repository;
+
+import com.parqueadero.api.aplication.Entities.Espacio;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * Repositorio de Spring Data JPA para la entidad Espacio.
+ * Interfaz que provee todos los métodos SQL sin tener que escribirlos.
+ */
+public interface EspacioRepository extends JpaRepository<Espacio, Long> {
+    // Al heredar de JpaRepository, obtiene funciones como save(), findAll(), etc.
+}

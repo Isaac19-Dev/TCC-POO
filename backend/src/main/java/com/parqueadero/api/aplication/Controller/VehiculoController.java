@@ -1,24 +1,63 @@
-package com.parqueadero.api.aplication.Controller; // Paquete de los controladores
-import com.parqueadero.api.aplication.Entities.Vehiculo; // Importa entidad Vehiculo
-import com.parqueadero.api.aplication.Service.IVehiculoService; // Importa interfaz de negocio para Vehiculos
-import java.util.List; // Importa la interfaz List
-import org.springframework.http.*; // Manejo HTTP (ResponseEntity, HttpStatus)
-import org.springframework.web.bind.annotation.*; // Anotaciones REST (RestController, GetMapping, etc.)
+package com.parqueadero.api.aplication.Controller;
 
-@RestController @RequestMapping("/vehiculos") // Api REST expuesta en la ruta "/vehiculos"
-public class VehiculoController { // Clase encargada de operaciones CRUD sobre vehículos
-    private final IVehiculoService vs; // Dependencia de lógica de negocio (Servicio)
-    public VehiculoController(IVehiculoService vs) { this.vs = vs; } // Constructor para inyectar el servicio
+import com.parqueadero.api.aplication.Entities.Vehiculo;
+import com.parqueadero.api.aplication.Service.IVehiculoService;
+import java.util.List;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
-    @GetMapping // GET a "/vehiculos"
-    public ResponseEntity<List<Vehiculo>> listar() { return ResponseEntity.ok(vs.listar()); } // Llama al servicio para obtener todos los vehículos y devuelve 200 OK
+/**
+ * Controlador REST encargado de gestionar los vehículos (clientes).
+ * Expone la API para el CRUD en la ruta "/vehiculos".
+ */
+@RestController 
+@RequestMapping("/vehiculos")
+public class VehiculoController {
+    
+    // Interfaz del servicio de vehículos
+    private final IVehiculoService vs; 
 
-    @PostMapping // POST a "/vehiculos" para crear
-    public ResponseEntity<Vehiculo> crear(@RequestBody Vehiculo v) { return new ResponseEntity<>(vs.crear(v), HttpStatus.CREATED); } // Pasa el objeto Vehiculo recibido en el body al servicio y devuelve 201 CREATED
+    /**
+     * Constructor para la inyección de dependencias.
+     */
+    public VehiculoController(IVehiculoService vs) { 
+        this.vs = vs; 
+    }
 
-    @PutMapping("/{id}") // PUT a "/vehiculos/{id}" para actualizar un vehículo existente
-    public ResponseEntity<Vehiculo> actualizar(@PathVariable Long id, @RequestBody Vehiculo v) { return ResponseEntity.ok(vs.actualizar(id, v)); } // Actualiza usando el ID de la URL y los datos del body
+    /**
+     * Obtiene la lista completa de vehículos registrados.
+     */
+    @GetMapping
+    public ResponseEntity<List<Vehiculo>> listar() { 
+        return ResponseEntity.ok(vs.listar()); 
+    }
 
-    @DeleteMapping("/{id}") // DELETE a "/vehiculos/{id}" para eliminar
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) { vs.eliminar(id); return ResponseEntity.noContent().build(); } // Elimina y retorna código 204 No Content
+    /**
+     * Registra un nuevo vehículo en la base de datos.
+     */
+    @PostMapping
+    public ResponseEntity<Vehiculo> crear(@RequestBody Vehiculo v) { 
+        // Retorna HTTP 201 Created junto con el vehículo guardado
+        return new ResponseEntity<>(vs.crear(v), HttpStatus.CREATED); 
+    }
+
+    /**
+     * Actualiza los datos de un vehículo existente.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Vehiculo> actualizar(@PathVariable Long id, @RequestBody Vehiculo v) { 
+        // Retorna HTTP 200 OK con el vehículo actualizado
+        return ResponseEntity.ok(vs.actualizar(id, v)); 
+    }
+
+    /**
+     * Elimina un vehículo de la base de datos.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) { 
+        // Ejecuta la eliminación
+        vs.eliminar(id); 
+        // Retorna HTTP 204 No Content indicando que se borró con éxito
+        return ResponseEntity.noContent().build(); 
+    }
 }

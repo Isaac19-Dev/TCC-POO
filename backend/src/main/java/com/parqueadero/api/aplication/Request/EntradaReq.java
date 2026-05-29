@@ -1,2 +1,11 @@
-package com.parqueadero.api.aplication.Request; // Paquete peticiones
-public record EntradaReq(Long vehiculoId, Long espacioId) {} // Objeto inmutable que recibe el JSON del frontend cuando se va a registrar la entrada de un vehículo. Puede recibir el espacioId nulo si se desea asignación automática.
+package com.parqueadero.api.aplication.Request;
+
+/**
+ * Objeto de petición para capturar los IDs que el frontend envía cuando quiere parquear un carro nuevo.
+ */
+public record EntradaReq(
+    // ID primario del auto
+    Long vehiculoId, 
+    // Espacio escogido. Si viene null, el sistema escoge uno automático.
+    Long espacioId
+) {}

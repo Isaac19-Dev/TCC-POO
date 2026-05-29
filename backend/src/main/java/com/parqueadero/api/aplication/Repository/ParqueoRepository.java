@@ -1,11 +1,24 @@
-package com.parqueadero.api.aplication.Repository; // Paquete repositorio
-import com.parqueadero.api.aplication.Entities.EstadoParqueo; // Importa Enum de Estado
-import com.parqueadero.api.aplication.Entities.Parqueo; // Importa Entidad Parqueo
-import java.util.List; // Utilidad de lista
-import java.util.Optional; // Utilidad para manejar valores que pueden ser nulos de forma segura
-import org.springframework.data.jpa.repository.JpaRepository; // Base JPA
+package com.parqueadero.api.aplication.Repository;
 
-public interface ParqueoRepository extends JpaRepository<Parqueo, Long> { // Repositorio que maneja el histórico de la tabla 'parqueos'
-    Optional<Parqueo> findByVehiculoIdAndEstado(Long vehiculoId, EstadoParqueo estado); // Query automático de Spring que busca un parqueo buscando por el ID del vehiculo Y su estado actual (Retorna un Optional porque puede que no haya ninguno)
-    List<Parqueo> findByEstado(EstadoParqueo estado); // Query automático que retorna todos los registros filtrando únicamente por la columna 'estado'
+import com.parqueadero.api.aplication.Entities.EstadoParqueo;
+import com.parqueadero.api.aplication.Entities.Parqueo;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * Repositorio para consultar el historial de parqueos.
+ */
+public interface ParqueoRepository extends JpaRepository<Parqueo, Long> {
+    
+    /**
+     * Busca en la base de datos si un vehículo tiene un registro de parqueo específico activo.
+     * Es equivalente a hacer un "SELECT * FROM parqueos WHERE vehiculo_id = X AND estado = Y".
+     */
+    Optional<Parqueo> findByVehiculoIdAndEstado(Long vehiculoId, EstadoParqueo estado);
+    
+    /**
+     * Trae una lista filtrando por la columna estado.
+     */
+    List<Parqueo> findByEstado(EstadoParqueo estado);
 }

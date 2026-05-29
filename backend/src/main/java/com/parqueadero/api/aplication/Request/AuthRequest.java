@@ -1,2 +1,11 @@
-package com.parqueadero.api.aplication.Request; // Paquete para peticiones HTTP
-public record AuthRequest(String username, String password) {} // Objeto inmutable que define la estructura JSON que se espera recibir del cliente al iniciar sesión ({"username": "", "password": ""})
+package com.parqueadero.api.aplication.Request;
+
+/**
+ * Molde inmutable que sirve para capturar las credenciales cuando el frontend hace una petición POST de Login.
+ */
+public record AuthRequest(
+    // Nombre del usuario que intenta loguearse
+    String username, 
+    // Contraseña digitada
+    String password
+) {}
