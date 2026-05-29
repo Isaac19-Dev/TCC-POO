@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parqueadero</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #EDE8E2;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+    .card {
+      background: #F7F4F0;
+      border-radius: 20px;
+      padding: 32px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    /* HERO */
+    .hero { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+    .hero-left h1 { font-size: 2.6rem; font-weight: 800; line-height: 1.15; margin-bottom: 16px; max-width: 500px; }
+    .hero-left p { color: #555; font-size: 0.95rem; max-width: 480px; margin-bottom: 28px; line-height: 1.6; }
+    .hero-actions { display: flex; gap: 12px; align-items: center; }
+
+    .btn-primary {
+      background: #C96A2B; color: white; border: none; border-radius: 30px;
+      padding: 12px 28px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #b05a22; }
+    .btn-ghost { background: none; border: none; font-size: 0.95rem; font-weight: 600; cursor: pointer; color: #1a1a1a; padding: 12px 8px; }
+    .btn-ghost:hover { text-decoration: underline; }
+
+    .hero-right { display: flex; flex-direction: column; gap: 12px; }
+    .info-card { background: white; border-radius: 14px; padding: 20px 22px; border: 1px solid rgba(0,0,0,0.07); }
+    .info-card .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 4px; }
+    .info-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .info-card p { font-size: 0.82rem; color: #666; line-height: 1.5; }
+    .api-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; margin-right: 6px; }
+    .api-dot.offline { background: #ef4444; }
+
+    /* SESSION */
+    .session-bar { background: #F7F4F0; border-radius: 20px; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(0,0,0,0.06); }
+    .session-bar .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #888; }
+    .session-bar h3 { font-size: 1rem; font-weight: 700; margin-top: 2px; }
+    .session-actions { display: flex; gap: 16px; align-items: center; }
+
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+    .badge.admin { background: #C96A2B; color: white; }
+    .badge.usuario { background: #16a34a; color: white; }
+
+    .btn-link { background: none; border: none; font-size: 0.85rem; color: #C96A2B; cursor: pointer; font-weight: 600; }
+    .btn-link:hover { text-decoration: underline; }
+    .btn-link.danger { color: #ef4444; }
+
+    /* STATS */
+    .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+    .stat-card { background: #F7F4F0; border-radius: 16px; padding: 22px 20px; border: 1px solid rgba(0,0,0,0.06); }
+    .stat-card .label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 8px; }
+    .stat-card .value { font-size: 2rem; font-weight: 800; }
+
+    /* LAYOUT */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-header h2 { font-size: 1.5rem; font-weight: 800; }
+    .section-label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 6px; }
+    .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    /* FORMS */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .form-grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-group label { font-size: 0.7rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.06em; }
+    input, select { background: white; border: 1px solid rgba(0,0,0,0.1); border-radius: 10px; padding: 10px 14px; font-size: 0.88rem; width: 100%; outline: none; transition: border-color 0.2s; }
+    input:focus, select:focus { border-color: #C96A2B; }
+    input::placeholder { color: #bbb; }
+
+    /* TABLES */
+    .users-table { width: 100%; border-collapse: collapse; }
+    .users-table th { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #888; text-align: left; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.08); }
+    .users-table td { padding: 10px 0; font-size: 0.88rem; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: middle; }
+
+    /* CARDS */
+    .user-cards, .vehicle-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .user-card, .vehicle-card, .parqueo-card {
+      background: white; border-radius: 14px; padding: 18px; border: 1px solid rgba(0,0,0,0.07);
+    }
+    .user-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .user-card-header h4, .vehicle-card h4, .parqueo-card h4 { font-size: 1rem; font-weight: 700; }
+    .vehicle-card h4 { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; }
+    .user-card-row, .vehicle-card-row, .parqueo-card-row { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 4px; color: #555; }
+    .user-card-row span:last-child, .vehicle-card-row span:last-child, .parqueo-card-row span:last-child { font-weight: 700; color: #1a1a1a; }
+    .user-card-footer { margin-top: 12px; display: flex; justify-content: flex-end; }
+    .parqueo-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+    .parqueo-card h4 { margin-bottom: 10px; }
+
+    .badge-activo { background: #dcfce7; color: #15803d; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+    .badge-finalizado { background: #f1f5f9; color: #64748b; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+
+    .btn-sm { background: #C96A2B; color: white; border: none; border-radius: 8px; padding: 6px 14px; font-size: 0.78rem; font-weight: 600; cursor: pointer; }
+    .btn-sm:hover { background: #b05a22; }
+    .btn-sm.danger { background: #ef4444; }
+    .btn-sm.danger:hover { background: #dc2626; }
+    .btn-sm.secondary { background: #e2ddd8; color: #1a1a1a; }
+    .btn-sm.secondary:hover { background: #d4cfc9; }
+
+    /* ===== ESPACIOS — PANEL VISUAL ===== */
+    .espacios-counters {
+      display: flex; gap: 12px; margin-bottom: 20px;
+    }
+    .esp-counter {
+      background: white; border-radius: 12px; padding: 14px 20px;
+      border: 1px solid rgba(0,0,0,0.07); text-align: center; min-width: 90px;
+    }
+    .esp-counter .label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 4px; }
+    .esp-counter .num { font-size: 1.6rem; font-weight: 800; }
+    .esp-counter .num.libre { color: #16a34a; }
+    .esp-counter .num.ocupado { color: #C96A2B; }
+
+    /* El grid de espacios */
+    .espacios-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    /* Cada celda del espacio */
+    .espacio-slot {
+      position: relative;
+      background: white;
+      border-radius: 14px;
+      padding: 14px 12px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.25s;
+      min-height: 100px;
+    }
+    .espacio-slot.libre {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+    }
+    .espacio-slot.libre:hover { border-color: #22c55e; transform: translateY(-2px); }
+
+    .espacio-slot.ocupado {
+      border-color: #fed7aa;
+      background: #fff7ed;
+    }
+    .espacio-slot.ocupado:hover { border-color: #C96A2B; transform: translateY(-2px); }
+
+    .espacio-codigo {
+      font-size: 1.1rem; font-weight: 800; margin-bottom: 6px;
+    }
+    .espacio-estado-badge {
+      display: inline-block; font-size: 0.6rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 2px 8px; border-radius: 20px; margin-bottom: 8px;
+    }
+    .espacio-slot.libre  .espacio-estado-badge { background: #dcfce7; color: #15803d; }
+    .espacio-slot.ocupado .espacio-estado-badge { background: #fed7aa; color: #92400e; }
+
+    .espacio-info { font-size: 0.72rem; color: #555; line-height: 1.5; }
+    .espacio-info strong { color: #1a1a1a; font-weight: 700; }
+
+    /* Tooltip con detalle al hacer hover */
+    .espacio-tooltip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      color: white;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 50;
+      pointer-events: none;
+      line-height: 1.6;
+    }
+    .espacio-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #1a1a1a;
+    }
+    .espacio-slot:hover .espacio-tooltip { display: block; }
+
+    .polling-indicator {
+      font-size: 0.7rem; color: #888; display: flex; align-items: center; gap: 6px;
+    }
+    .polling-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.3; }
+    }
+
+    /* LOGIN */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .login-card { background: #F7F4F0; border-radius: 24px; padding: 40px; width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    .login-card h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+    .login-card p { font-size: 0.85rem; color: #666; margin-bottom: 24px; }
+    .login-card .field-group { margin-bottom: 14px; }
+    .login-card .btn-primary { width: 100%; padding: 14px; font-size: 1rem; border-radius: 12px; margin-top: 6px; }
+    .error-msg { color: #ef4444; font-size: 0.82rem; margin-top: 8px; min-height: 18px; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 28px; right: 28px; background: #1a1a1a; color: white; padding: 14px 22px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; z-index: 200; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { background: #15803d; }
+    .toast.error { background: #dc2626; }
+
+    .hidden { display: none !important; }
+    .mt-12 { margin-top: 12px; }
+
+    @media (max-width: 800px) {
+      .hero { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      .two-cols { grid-template-columns: 1fr; }
+      .espacios-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div class="overlay" id="loginOverlay">
+  <div class="login-card">
+    <h2>Iniciar sesion</h2>
+    <p>Ingresa tus credenciales para acceder al panel.</p>
+    <div class="field-group">
+      <label>Usuario</label>
+      <input type="text" id="loginUser" placeholder="admin" />
+    </div>
+    <div class="field-group">
+      <label>Contrasena</label>
+      <input type="password" id="loginPass" placeholder="••••••••" />
+    </div>
+    <div class="error-msg" id="loginError"></div>
+    <button class="btn-primary" onclick="doLogin()">Acceder</button>
+  </div>
+</div>
+
+<div class="container" id="app">
+
+  <!-- HERO -->
+  <div class="hero card">
+    <div class="hero-left">
+      <h1>Parqueadero con acceso por roles y panel operativo</h1>
+      <p>Login, registro de usuarios, control de vehiculos, entradas y salidas, cobros automaticos y panel visual de espacios en tiempo real.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('loginOverlay').classList.remove('hidden')">Acceder ahora</button>
+        <button class="btn-ghost" onclick="scrollTo({top:400,behavior:'smooth'})">Ver panel</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="info-card">
+        <div class="label">Estado API</div>
+        <h3><span class="api-dot" id="apiDot"></span><span id="apiStatus">Verificando...</span></h3>
+        <p>El panel detecta automaticamente si el backend esta activo.</p>
+      </div>
+      <div class="info-card">
+        <div class="label">Acceso Inicial</div>
+        <h3>admin / admin123</h3>
+        <p>Administrador con acceso completo al sistema.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION BAR -->
+  <div class="session-bar" id="sessionBar">
+    <div>
+      <div class="label">Sesion Abierta</div>
+      <h3 id="sessionName">—</h3>
+    </div>
+    <div class="session-actions">
+      <span class="badge admin" id="sessionBadge">—</span>
+      <button class="btn-link danger" onclick="cerrarSesion()">Cerrar sesion</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card"><div class="label">Rol activo</div><div class="value" id="statRol">—</div></div>
+    <div class="stat-card"><div class="label">Usuarios</div><div class="value" id="statUsuarios">—</div></div>
+    <div class="stat-card"><div class="label">Vehiculos</div><div class="value" id="statVehiculos">—</div></div>
+    <div class="stat-card"><div class="label">Parqueos Activos</div><div class="value" id="statActivos">—</div></div>
+    <div class="stat-card"><div class="label">Historial</div><div class="value" id="statHistorial">—</div></div>
+  </div>
+
+  <!-- PERFIL / USUARIOS TABLE -->
+  <div class="card">
+    <div class="section-header">
+      <div>
+        <div class="section-label">Vista General</div>
+        <h2>Perfil y contexto de trabajo</h2>
+      </div>
+      <button class="btn-sm secondary" onclick="cargarTodo()">Resumen</button>
+    </div>
+    <table class="users-table">
+      <thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th>ID</th></tr></thead>
+      <tbody id="usersTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ADMIN + VEHICULOS -->
+  <div class="two-cols">
+    <!-- USUARIOS -->
+    <div class="card">
+      <div class="section-header">
+        <div>
+          <div class="section-label">Administracion</div>
+          <h2>Usuarios registrados</h2>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge admin" id="adminOnlyBadge">ADMIN</span>
+          <button class="btn-sm secondary" onclick="cargarUsuarios()">Actualizar</button>
+        </div>
+      </div>
+      <div id="addUserForm">
+        <div class="form-grid-4">
+          <div class="field-group"><label>Nombre</label><input type="text" id="nuNombre" placeholder="Nuevo usuario" /></div>
+          <div class="field-group"><label>Usuario</label><input type="text" id="nuUser" placeholder="usuario_nuevo" /></div>
+          <div class="field-group"><label>Password</label><input type="text" id="nuPass" placeholder="clave123" /></div>
+          <div class="field-group"><label>Rol</label>
+            <select id="nuRol"><option value="USUARIO">USUARIO</option><option value="ADMIN">ADMIN</option></select>
+          </div>
+        </div>
+        <button class="btn-primary" style="border-radius:12px;padding:10px 22px;font-size:0.88rem;" onclick="agregarUsuario()">Agregar usuario</button>
+      </div>
+      <div class="user-cards" id="userCards"></div>
+    </div>
+
+    <!-- VEHICULOS -->
+    <div class="card">
+      <div class="section-header">
+        <div><div class="section-label">Operacion</div><h2>Registrar vehiculo</h2></div>
+      </div>
+      <div class="form-grid">
+        <div class="field-group"><label>Placa</label><input type="text" id="vPlaca" placeholder="ABC123" /></div>
+        <div class="field-group"><label>Tipo</label>
+          <select id="vTipo"><option value="CARRO">CARRO</option><option value="MOTO">MOTO</option></select>
+        </div>
+      </div>
+      <div class="field-group mt-12"><label>Propietario</label><input type="text" id="vPropietario" placeholder="Isaac Perez" /></div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn-primary" style="border-radius:12px;padding:10px 22px;font-size:0.88rem;flex:1" onclick="crearVehiculo()">Crear vehiculo</button>
+        <button class="btn-sm secondary" style="padding:10px 16px" onclick="cargarVehiculos()">Actualizar lista</button>
+      </div>
+      <div class="vehicle-cards" id="vehicleCards"></div>
+    </div>
+  </div>
+
+  <!-- ===== ESPACIOS EN TIEMPO REAL ===== -->
+  <div class="card">
+    <div class="section-header">
+      <div>
+        <div class="section-label">Vista en tiempo real</div>
+        <h2>Estado del Parqueadero</h2>
+      </div>
+      <div class="polling-indicator">
+        <div class="polling-dot"></div>
+        Actualizando cada 3s
+      </div>
+    </div>
+
+    <!-- Contadores resumen -->
+    <div class="espacios-counters">
+      <div class="esp-counter">
+        <div class="label">Total</div>
+        <div class="num" id="espTotal">—</div>
+      </div>
+      <div class="esp-counter">
+        <div class="label">Libres</div>
+        <div class="num libre" id="espLibres">—</div>
+      </div>
+      <div class="esp-counter">
+        <div class="label">Ocupados</div>
+        <div class="num ocupado" id="espOcupados">—</div>
+      </div>
+    </div>
+
+    <!-- Grid de espacios -->
+    <div class="espacios-grid" id="espaciosGrid">
+      <div style="color:#aaa;font-size:0.85rem;grid-column:1/-1">Inicia sesion para ver los espacios...</div>
+    </div>
+  </div>
+
+  <!-- PARQUEOS -->
+  <div class="card">
+    <div class="section-header">
+      <div><div class="section-label">Registro</div><h2>Entradas y Salidas</h2></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div style="width:220px">
+          <input type="text" id="entradaVehiculo" list="entradaVehiculoList" placeholder="Escribe placa o propietario" autocomplete="off" />
+          <datalist id="entradaVehiculoList"></datalist>
+        </div>
+        <div style="width:180px">
+          <input type="text" id="entradaEspacio" list="entradaEspacioList" placeholder="Plaza opcional" autocomplete="off" />
+          <datalist id="entradaEspacioList"></datalist>
+        </div>
+        <button class="btn-primary" style="border-radius:12px;padding:10px 18px;font-size:0.88rem" onclick="registrarEntrada()">Registrar entrada</button>
+        <button class="btn-sm secondary" onclick="cargarParqueos()">Actualizar</button>
+      </div>
+    </div>
+    <div class="parqueo-cards" id="parqueoCards"></div>
+  </div>
+
+</div>
+
+<script>
+const API = 'http://localhost:8080';
+let token    = localStorage.getItem('pq_token') || '';
+let session  = JSON.parse(localStorage.getItem('pq_session') || 'null');
+let usuarios = JSON.parse(localStorage.getItem('pq_usuarios') || '[]');
+let pollingInterval = null;
+
+// Sembrar admin inicial si no hay usuarios guardados
+if (!usuarios.length) {
+  usuarios = [{ id: 1, nombre: 'Administrador', username: 'admin', password: 'admin123', rol: 'ADMIN' }];
+  localStorage.setItem('pq_usuarios', JSON.stringify(usuarios));
+}
+
+// ─── UTILIDADES ─────────────────────────────────────────────────────────────
+
+function toast(msg, tipo = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + tipo;
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+function auth() {
+  return { Authorization: 'Bearer ' + token };
+}
+
+function formatFecha(f) {
+  if (!f) return '—';
+  return new Date(f).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' });
+}
+
+// ─── API STATUS ──────────────────────────────────────────────────────────────
+
+async function checkApi() {
+  try {
+    const r = await fetch(API + '/vehiculos', { headers: auth() });
+    const ok = r.ok || r.status < 500;
+    document.getElementById('apiDot').className = 'api-dot' + (ok ? '' : ' offline');
+    document.getElementById('apiStatus').textContent = ok ? 'API conectada' : 'API desconectada';
+  } catch {
+    document.getElementById('apiDot').className = 'api-dot offline';
+    document.getElementById('apiStatus').textContent = 'API desconectada';
+  }
+}
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+
+async function doLogin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value.trim();
+  document.getElementById('loginError').textContent = '';
+  try {
+    const r = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    if (!r.ok) throw new Error('Credenciales invalidas');
+    const data = await r.json();
+    token = data.token;
+    localStorage.setItem('pq_token', token);
+    const usr = usuarios.find(u => u.username === username);
+    session = { username: data.username, nombre: usr ? usr.nombre : data.username, rol: usr ? usr.rol : 'ADMIN' };
+    localStorage.setItem('pq_session', JSON.stringify(session));
+    document.getElementById('loginOverlay').classList.add('hidden');
+    renderSession();
+    cargarTodo();
+    iniciarPolling();
+    toast('Sesion iniciada como ' + session.nombre, 'success');
+  } catch (e) {
+    document.getElementById('loginError').textContent = e.message || 'Error de conexion';
+  }
+}
+
+function cerrarSesion() {
+  session = null; token = '';
+  localStorage.removeItem('pq_token');
+  localStorage.removeItem('pq_session');
+  detenerPolling();
+  ['sessionName','statRol','statUsuarios','statVehiculos','statActivos','statHistorial'].forEach(id => {
+    document.getElementById(id).textContent = '—';
+  });
+  document.getElementById('sessionBadge').textContent = '—';
+  ['userCards','vehicleCards','parqueoCards','usersTableBody'].forEach(id => {
+    document.getElementById(id).innerHTML = '';
+  });
+  document.getElementById('espaciosGrid').innerHTML = '<div style="color:#aaa;font-size:0.85rem;grid-column:1/-1">Inicia sesion para ver los espacios...</div>';
+  document.getElementById('loginOverlay').classList.remove('hidden');
+}
+
+function renderSession() {
+  if (!session) return;
+  document.getElementById('sessionName').textContent = session.nombre + ' (@' + session.username + ')';
+  const badge = document.getElementById('sessionBadge');
+  badge.textContent = session.rol;
+  badge.className = 'badge ' + (session.rol === 'ADMIN' ? 'admin' : 'usuario');
+  document.getElementById('statRol').textContent = session.rol;
+  const isAdmin = session.rol === 'ADMIN';
+  document.getElementById('addUserForm').style.display = isAdmin ? '' : 'none';
+  document.getElementById('adminOnlyBadge').style.display = isAdmin ? '' : 'none';
+}
+
+// ─── USUARIOS (localStorage) ─────────────────────────────────────────────────
+
+function cargarUsuarios() {
+  document.getElementById('statUsuarios').textContent = usuarios.length;
+  document.getElementById('usersTableBody').innerHTML = usuarios.map(u =>
+    `<tr><td>${u.nombre}</td><td>@${u.username}</td><td><span class="badge ${u.rol==='ADMIN'?'admin':'usuario'}">${u.rol}</span></td><td>${u.id}</td></tr>`
+  ).join('');
+  document.getElementById('userCards').innerHTML = usuarios.map(u => `
+    <div class="user-card">
+      <div class="user-card-header"><h4>${u.nombre}</h4><span class="badge ${u.rol==='ADMIN'?'admin':'usuario'}">${u.rol}</span></div>
+      <div class="user-card-row"><span>Usuario</span><span>@${u.username}</span></div>
+      <div class="user-card-row"><span>Estado</span><span>Activo</span></div>
+      <div class="user-card-row"><span>Id</span><span>${u.id}</span></div>
+      <div class="user-card-footer">
+        ${session && session.username === u.username
+          ? '<span class="btn-link">Sesion actual</span>'
+          : `<button class="btn-link danger" onclick="quitarUsuario(${u.id})">Quitar usuario</button>`}
+      </div>
+    </div>`
+  ).join('');
+}
+
+function agregarUsuario() {
+  const nombre = document.getElementById('nuNombre').value.trim();
+  const username = document.getElementById('nuUser').value.trim();
+  const password = document.getElementById('nuPass').value.trim();
+  const rol = document.getElementById('nuRol').value;
+  if (!nombre || !username || !password) { toast('Completa todos los campos', 'error'); return; }
+  if (usuarios.find(u => u.username === username)) { toast('Usuario ya existe', 'error'); return; }
+  const id = Math.max(0, ...usuarios.map(u => u.id)) + 1;
+  usuarios.push({ id, nombre, username, password, rol });
+  localStorage.setItem('pq_usuarios', JSON.stringify(usuarios));
+  cargarUsuarios();
+  ['nuNombre','nuUser','nuPass'].forEach(id => document.getElementById(id).value = '');
+  toast('Usuario agregado', 'success');
+}
+
+function quitarUsuario(id) {
+  usuarios = usuarios.filter(u => u.id !== id);
+  localStorage.setItem('pq_usuarios', JSON.stringify(usuarios));
+  cargarUsuarios();
+  toast('Usuario eliminado');
+}
+
+// ─── VEHICULOS ───────────────────────────────────────────────────────────────
+
+async function cargarVehiculos() {
+  try {
+    const r = await fetch(API + '/vehiculos', { headers: auth() });
+    const veh = await r.json();
+    document.getElementById('statVehiculos').textContent = veh.length;
+    const entradaInput = document.getElementById('entradaVehiculo');
+    const lista = document.getElementById('entradaVehiculoList');
+    lista.innerHTML = '';
+    veh.forEach(v => {
+      const o = document.createElement('option');
+      o.value = `${v.placa} - ${v.propietario}`;
+      o.textContent = v.placa + ' — ' + v.propietario;
+      lista.appendChild(o);
+    });
+    entradaInput.dataset.vehiculos = JSON.stringify(veh);
+    document.getElementById('vehicleCards').innerHTML = veh.map(v => `
+      <div class="vehicle-card">
+        <h4>${v.placa}</h4>
+        <div class="vehicle-card-row"><span>Tipo</span><span>${v.tipo}</span></div>
+        <div class="vehicle-card-row"><span>Propietario</span><span>${v.propietario}</span></div>
+        <div class="vehicle-card-row"><span>Id</span><span>${v.id}</span></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn-sm" onclick="registrarEntradaVeh(${v.id})">Entrada</button>
+          <button class="btn-sm danger" onclick="eliminarVehiculo(${v.id})">Eliminar</button>
+        </div>
+      </div>`
+    ).join('');
+  } catch { toast('Error cargando vehiculos', 'error'); }
+}
+
+async function crearVehiculo() {
+  const placa = document.getElementById('vPlaca').value.trim().toUpperCase();
+  const tipo  = document.getElementById('vTipo').value;
+  const prop  = document.getElementById('vPropietario').value.trim();
+  if (!placa || !prop) { toast('Completa placa y propietario', 'error'); return; }
+  try {
+    const r = await fetch(API + '/vehiculos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...auth() },
+      body: JSON.stringify({ placa, tipo, propietario: prop })
+    });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.message); }
+    document.getElementById('vPlaca').value = '';
+    document.getElementById('vPropietario').value = '';
+    cargarVehiculos();
+    toast('Vehiculo creado: ' + placa, 'success');
+  } catch(e) { toast(e.message || 'Error al crear vehiculo', 'error'); }
+}
+
+function resolverVehiculoEntrada() {
+  const entradaInput = document.getElementById('entradaVehiculo');
+  const texto = entradaInput.value.trim().toUpperCase();
+  const vehiculos = JSON.parse(entradaInput.dataset.vehiculos || '[]');
+  if (!texto) {
+    entradaInput.dataset.selectedId = '';
+    return null;
+  }
+
+  const coincidenciaExacta = vehiculos.find(v =>
+    `${v.placa} - ${v.propietario}`.toUpperCase() === texto ||
+    v.placa.toUpperCase() === texto
+  );
+
+  if (coincidenciaExacta) {
+    entradaInput.dataset.selectedId = coincidenciaExacta.id;
+    entradaInput.value = `${coincidenciaExacta.placa} - ${coincidenciaExacta.propietario}`;
+    return coincidenciaExacta;
+  }
+
+  const coincidencias = vehiculos.filter(v =>
+    v.placa.toUpperCase().includes(texto) ||
+    v.propietario.toUpperCase().includes(texto)
+  );
+
+  if (coincidencias.length === 1) {
+    entradaInput.dataset.selectedId = coincidencias[0].id;
+    entradaInput.value = `${coincidencias[0].placa} - ${coincidencias[0].propietario}`;
+    return coincidencias[0];
+  }
+
+  entradaInput.dataset.selectedId = '';
+  return null;
+}
+
+function resolverEspacioEntrada() {
+  const entradaInput = document.getElementById('entradaEspacio');
+  const texto = entradaInput.value.trim().toUpperCase();
+  const espacios = JSON.parse(entradaInput.dataset.espacios || '[]');
+  if (!texto) {
+    entradaInput.dataset.selectedId = '';
+    return null;
+  }
+
+  const coincidenciaExacta = espacios.find(e => e.codigo.toUpperCase() === texto);
+  if (coincidenciaExacta) {
+    entradaInput.dataset.selectedId = coincidenciaExacta.id;
+    entradaInput.value = coincidenciaExacta.codigo;
+    return coincidenciaExacta;
+  }
+
+  const coincidencias = espacios.filter(e => e.codigo.toUpperCase().includes(texto));
+  if (coincidencias.length === 1) {
+    entradaInput.dataset.selectedId = coincidencias[0].id;
+    entradaInput.value = coincidencias[0].codigo;
+    return coincidencias[0];
+  }
+
+  entradaInput.dataset.selectedId = '';
+  return null;
+}
+
+async function eliminarVehiculo(id) {
+  try {
+    await fetch(API + '/vehiculos/' + id, { method: 'DELETE', headers: auth() });
+    cargarVehiculos();
+    toast('Vehiculo eliminado');
+  } catch { toast('Error al eliminar', 'error'); }
+}
+
+// ─── PARQUEOS ────────────────────────────────────────────────────────────────
+
+async function cargarParqueos() {
+  try {
+    const r = await fetch(API + '/parqueos', { headers: auth() });
+    const parqueos = await r.json();
+    const activos = parqueos.filter(p => p.estado === 'ACTIVO');
+    document.getElementById('statActivos').textContent = activos.length;
+    document.getElementById('statHistorial').textContent = parqueos.length;
+    document.getElementById('parqueoCards').innerHTML = [...parqueos].reverse().map(p => `
+      <div class="parqueo-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h4>
+            <span style="color:#1a1a1a">${p.vehiculo?.placa || '—'}</span>
+            ${p.espacio ? `<span style="color:#C96A2B;font-weight:700"> · Espacio ${p.espacio.codigo}</span>` : ''}
+          </h4>
+          <span class="${p.estado === 'ACTIVO' ? 'badge-activo' : 'badge-finalizado'}">${p.estado}</span>
+        </div>
+        ${p.vehiculo ? `<div class="parqueo-card-row"><span>Propietario</span><span>${p.vehiculo.propietario}</span></div>` : ''}
+        ${p.vehiculo ? `<div class="parqueo-card-row"><span>Tipo</span><span>${p.vehiculo.tipo}</span></div>` : ''}
+        <div class="parqueo-card-row"><span>Entrada</span><span>${formatFecha(p.fechaEntrada)}</span></div>
+        <div class="parqueo-card-row"><span>Salida</span><span>${p.fechaSalida ? formatFecha(p.fechaSalida) : '—'}</span></div>
+        <div class="parqueo-card-row"><span>Horas</span><span>${p.horas ?? '—'}</span></div>
+        <div class="parqueo-card-row"><span>Total</span><span>${p.total != null ? '$' + p.total.toLocaleString() : '—'}</span></div>
+        ${p.registradoPor ? `<div class="parqueo-card-row"><span>Registrado por</span><span>${p.registradoPor}</span></div>` : ''}
+        ${p.estado === 'ACTIVO'
+          ? `<button class="btn-sm mt-12" style="width:100%" onclick="registrarSalida(${p.id})">Registrar salida</button>`
+          : `<button class="btn-sm secondary mt-12" style="width:100%" onclick="verComprobante(${p.id},${p.total},${JSON.stringify(p.vehiculo?.placa)})">Ver comprobante</button>`}
+      </div>`
+    ).join('');
+    cargarEspacios();
+  } catch { toast('Error cargando parqueos', 'error'); }
+}
+
+async function registrarEntradaVeh(vehiculoId, espacioId = null) {
+  try {
+    const r = await fetch(API + '/parqueos/entrada', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...auth() },
+      body: JSON.stringify({ vehiculoId, espacioId })
+    });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.message); }
+    document.getElementById('entradaVehiculo').value = '';
+    document.getElementById('entradaVehiculo').dataset.selectedId = '';
+    document.getElementById('entradaEspacio').value = '';
+    document.getElementById('entradaEspacio').dataset.selectedId = '';
+    cargarParqueos();
+    toast('Entrada registrada', 'success');
+  } catch(e) { toast(e.message || 'Error al registrar entrada', 'error'); }
+}
+
+async function registrarEntrada() {
+  const entradaInput = document.getElementById('entradaVehiculo');
+  const vehiculo = resolverVehiculoEntrada();
+  const espacioInput = document.getElementById('entradaEspacio');
+  const espacio = resolverEspacioEntrada();
+  const id = entradaInput.dataset.selectedId || vehiculo?.id;
+  if (!id) { toast('Selecciona un vehiculo', 'error'); return; }
+  const espacioId = espacioInput.dataset.selectedId || espacio?.id || null;
+  await registrarEntradaVeh(Number(id), espacioId ? Number(espacioId) : null);
+}
+
+async function registrarSalida(id) {
+  try {
+    const r = await fetch(API + '/parqueos/salida/' + id, { method: 'PUT', headers: auth() });
+    if (!r.ok) { const e = await r.json(); throw new Error(e.message); }
+    const p = await r.json();
+    cargarParqueos();
+    toast('Salida registrada · Total: $' + (p.total || 0).toLocaleString(), 'success');
+  } catch(e) { toast(e.message || 'Error al registrar salida', 'error'); }
+}
+
+function verComprobante(id, total, placa) {
+  toast('Comprobante #' + id + ' · ' + (placa || '') + ' · $' + (total || 0).toLocaleString());
+}
+
+// ─── ESPACIOS (polling cada 3 segundos) ──────────────────────────────────────
+
+async function cargarEspacios() {
+  if (!session) return;
+  try {
+    const r = await fetch(API + '/parqueos/espacios', { headers: auth() });
+    if (!r.ok) return;
+    const espacios = await r.json();
+    const espaciosLibres = espacios.filter(e => e.estado === 'LIBRE');
+    const entradaEspacio = document.getElementById('entradaEspacio');
+    const entradaEspacioList = document.getElementById('entradaEspacioList');
+    entradaEspacioList.innerHTML = '';
+    espaciosLibres.forEach(e => {
+      const option = document.createElement('option');
+      option.value = e.codigo;
+      entradaEspacioList.appendChild(option);
+    });
+    entradaEspacio.dataset.espacios = JSON.stringify(espaciosLibres);
+
+    const libres   = espacios.filter(e => e.estado === 'LIBRE').length;
+    const ocupados = espacios.filter(e => e.estado === 'OCUPADO').length;
+    document.getElementById('espTotal').textContent   = espacios.length;
+    document.getElementById('espLibres').textContent  = libres;
+    document.getElementById('espOcupados').textContent = ocupados;
+
+    document.getElementById('espaciosGrid').innerHTML = espacios.map(e => {
+      const libre = e.estado === 'LIBRE';
+      const tooltip = libre
+        ? '<div class="espacio-tooltip">Espacio disponible</div>'
+        : `<div class="espacio-tooltip">
+             <strong>${e.placa}</strong><br>
+             ${e.tipo} · ${e.propietario}<br>
+             Entro: ${formatFecha(e.horaEntrada)}<br>
+             ${e.registradoPor ? 'Operario: ' + e.registradoPor : ''}
+           </div>`;
+
+      const info = libre
+        ? '<div class="espacio-info">Disponible</div>'
+        : `<div class="espacio-info">
+             <strong>${e.placa}</strong><br>
+             ${e.tipo}<br>
+             ${e.propietario}
+           </div>`;
+
+      return `
+        <div class="espacio-slot ${libre ? 'libre' : 'ocupado'}">
+          ${tooltip}
+          <div class="espacio-codigo">${e.codigo}</div>
+          <span class="espacio-estado-badge">${e.estado}</span>
+          ${info}
+        </div>`;
+    }).join('');
+  } catch { /* silencioso — puede fallar en el primer intento */ }
+}
+
+function iniciarPolling() {
+  cargarEspacios(); // carga inmediata
+  cargarParqueos(); // carga inmediata de parqueos
+  if (pollingInterval) clearInterval(pollingInterval);
+  pollingInterval = setInterval(() => {
+    cargarEspacios();
+    cargarParqueos();
+  }, 3000);
+}
+
+function detenerPolling() {
+  if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
+}
+
+// ─── CARGA GENERAL ───────────────────────────────────────────────────────────
+
+async function cargarTodo() {
+  if (!session) return;
+  renderSession();
+  cargarUsuarios();
+  await cargarVehiculos();
+  await cargarParqueos();
+  await cargarEspacios();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+checkApi();
+setInterval(checkApi, 15000);
+
+// Si habia sesion guardada, restaurarla
+if (session && token) {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  cargarTodo();
+  iniciarPolling();
+}
+
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('vPlaca').addEventListener('input', e => { e.target.value = e.target.value.toUpperCase(); });
+document.getElementById('entradaVehiculo').addEventListener('input', () => { resolverVehiculoEntrada(); });
+document.getElementById('entradaEspacio').addEventListener('input', e => {
+  e.target.value = e.target.value.toUpperCase();
+  resolverEspacioEntrada();
+});
+document.getElementById('entradaVehiculo').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    registrarEntrada();
+  }
+});
+document.getElementById('entradaEspacio').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    registrarEntrada();
+  }
+});
+document.getElementById('vPlaca').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    crearVehiculo();
+  }
+});
+document.getElementById('vPropietario').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    crearVehiculo();
+  }
+});
+</script>
+</body>
+</html>
