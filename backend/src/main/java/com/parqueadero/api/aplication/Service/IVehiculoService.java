@@ -3,32 +3,24 @@ package com.parqueadero.api.aplication.Service;
 import com.parqueadero.api.aplication.Entities.Vehiculo;
 import java.util.List;
 
-/**
- * Interfaz que define las reglas para la administración de vehículos.
- */
+// Interfaz (contrato) del servicio de vehículos.
+// Define todas las operaciones disponibles sobre la entidad Vehiculo.
+// La implementación está en VehiculoServiceImpl.java.
 public interface IVehiculoService {
-    /**
-     * Guarda un nuevo vehículo.
-     */
-    Vehiculo crear(Vehiculo v);
-    
-    /**
-     * Obtiene el listado total de vehículos.
-     */
+
+    // Retorna la lista completa de todos los vehículos registrados en el sistema.
     List<Vehiculo> listar();
-    
-    /**
-     * Busca un vehículo específico por su identificador.
-     */
+
+    // Crea y guarda un nuevo vehículo. Valida que la placa no esté duplicada.
+    Vehiculo crear(Vehiculo v);
+
+    // Busca un vehículo por su ID. Lanza excepción si no existe.
     Vehiculo obtener(Long id);
-    
-    /**
-     * Sobrescribe los datos de un vehículo existente.
-     */
+
+    // Actualiza los datos de un vehículo existente (placa, tipo, propietario).
+    // Valida que la nueva placa no pertenezca a otro vehículo diferente.
     Vehiculo actualizar(Long id, Vehiculo v);
-    
-    /**
-     * Elimina un vehículo por su identificador.
-     */
+
+    // Elimina permanentemente un vehículo de la base de datos por su ID.
     void eliminar(Long id);
 }

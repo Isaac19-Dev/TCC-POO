@@ -1,11 +1,9 @@
 package com.parqueadero.api.aplication.Entities;
 
-/**
- * Enumeración que controla los estados del ciclo de vida de un servicio de parqueo.
- */
-public enum EstadoParqueo { 
-    // El vehículo sigue dentro del parqueadero
-    ACTIVO, 
-    // El vehículo ya pagó y se retiró del parqueadero
-    FINALIZADO 
+// Enum (enumeración) que representa los posibles estados de un registro de parqueo.
+// ACTIVO: el vehículo está actualmente dentro del parqueadero.
+// FINALIZADO: el vehículo ya salió, se calculó el tiempo y se cobró.
+public enum EstadoParqueo {
+    ACTIVO,
+    FINALIZADO
 }

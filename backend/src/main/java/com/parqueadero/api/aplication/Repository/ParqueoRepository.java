@@ -1,24 +1,21 @@
 package com.parqueadero.api.aplication.Repository;
 
-import com.parqueadero.api.aplication.Entities.EstadoParqueo;
-import com.parqueadero.api.aplication.Entities.Parqueo;
-import java.util.List;
-import java.util.Optional;
+import com.parqueadero.api.aplication.Entities.*;
+import java.util.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-/**
- * Repositorio para consultar el historial de parqueos.
- */
+// Repositorio para la entidad Parqueo (sesiones de entrada/salida de vehículos).
+// Hereda todos los métodos CRUD de JpaRepository automáticamente.
 public interface ParqueoRepository extends JpaRepository<Parqueo, Long> {
-    
-    /**
-     * Busca en la base de datos si un vehículo tiene un registro de parqueo específico activo.
-     * Es equivalente a hacer un "SELECT * FROM parqueos WHERE vehiculo_id = X AND estado = Y".
-     */
-    Optional<Parqueo> findByVehiculoIdAndEstado(Long vehiculoId, EstadoParqueo estado);
-    
-    /**
-     * Trae una lista filtrando por la columna estado.
-     */
-    List<Parqueo> findByEstado(EstadoParqueo estado);
+
+    // Busca un parqueo activo específico de un vehículo.
+    // Spring genera el SQL: SELECT * FROM parqueos WHERE vehiculo_id = ? AND estado = ?
+    // Retorna Optional porque puede no existir (el vehículo podría no estar parqueado).
+    // Se usa para evitar que un vehículo tenga dos parqueos activos al mismo tiempo.
+    Optional<Parqueo> findByVehiculoIdAndEstado(Long vid, EstadoParqueo est);
+
+    // Devuelve todos los parqueos con un estado específico (ACTIVO o FINALIZADO).
+    // SQL generado: SELECT * FROM parqueos WHERE estado = ?
+    // Se usa para listar todos los vehículos actualmente dentro del parqueadero.
+    List<Parqueo> findByEstado(EstadoParqueo est);
 }

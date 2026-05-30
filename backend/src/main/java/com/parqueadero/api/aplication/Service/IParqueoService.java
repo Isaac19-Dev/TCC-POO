@@ -4,32 +4,28 @@ import com.parqueadero.api.aplication.Entities.Parqueo;
 import com.parqueadero.api.aplication.DTO.EspacioDTO;
 import java.util.List;
 
-/**
- * Interfaz que define las operaciones de negocio para la gestión de parqueos.
- */
+// Interfaz (contrato) del servicio de parqueos.
+// Define todas las operaciones de negocio relacionadas con el estacionamiento.
+// La implementación está en ParqueoServiceImpl.java.
 public interface IParqueoService {
-    /**
-     * Registra el ingreso de un vehículo.
-     */
-    Parqueo registrarEntrada(Long vehiculoId, Long espacioId, String registradoPor);
-    
-    /**
-     * Registra la salida de un vehículo y realiza el cobro.
-     */
-    Parqueo registrarSalida(Long id);
-    
-    /**
-     * Obtiene todos los registros de parqueo (historial).
-     */
+
+    // Retorna el historial completo de todos los parqueos (activos y finalizados).
     List<Parqueo> listar();
-    
-    /**
-     * Obtiene solo los parqueos que aún no han salido.
-     */
+
+    // Retorna solo los parqueos con estado ACTIVO (vehículos actualmente dentro).
     List<Parqueo> listarActivos();
-    
-    /**
-     * Obtiene el listado de espacios fijos indicando cuáles están ocupados.
-     */
+
+    // Retorna el estado de todos los espacios: cuáles están libres y cuáles ocupados,
+    // con información del vehículo que los ocupa si están ocupados.
     List<EspacioDTO> listarEspacios();
+
+    // Registra la entrada de un vehículo al parqueadero.
+    // vid → ID del vehículo
+    // eid → ID del espacio (puede ser null para asignación automática)
+    // by  → nombre del usuario que registra la entrada
+    Parqueo registrarEntrada(Long vid, Long eid, String by);
+
+    // Registra la salida del vehículo, calcula el tiempo y cobra la tarifa.
+    // id → ID del parqueo activo a finalizar
+    Parqueo registrarSalida(Long id);
 }

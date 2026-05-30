@@ -6,31 +6,29 @@ import com.parqueadero.api.aplication.Service.IAuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controlador REST encargado de la autenticación de usuarios.
- * Recibe peticiones HTTP en la ruta "/auth".
- */
-@RestController 
+// @RestController indica que esta clase es un controlador REST.
+// Combina @Controller + @ResponseBody: todos los métodos retornan JSON automáticamente.
+// @RequestMapping("/auth") → todas las rutas de este controlador empiezan con /auth
+@RestController
 @RequestMapping("/auth")
 public class AuthController {
-    
-    // Dependencia del servicio de autenticación
-    private final IAuthService as; 
 
-    /**
-     * Constructor que inyecta el servicio de autenticación.
-     */
-    public AuthController(IAuthService as) { 
-        this.as = as; 
+    // Servicio de autenticación inyectado por constructor.
+    // Se usa la interfaz (no la implementación) para desacoplar capas.
+    private final IAuthService as;
+
+    public AuthController(IAuthService as) {
+        this.as = as;
     }
 
-    /**
-     * Endpoint para iniciar sesión.
-     * Recibe credenciales y devuelve un token JWT (simulado).
-     */
+    // ── POST /auth/login ──
+    // Endpoint para que el usuario inicie sesión.
+    // @PostMapping → solo acepta peticiones HTTP POST.
+    // @RequestBody → deserializa el JSON del body a un objeto AuthRequest.
+    // Retorna HTTP 200 con el token si las credenciales son correctas.
+    // Retorna HTTP 400 si son incorrectas (el GlobalExceptionHandler lo maneja).
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequest req) { 
-        // Llama al servicio y devuelve la respuesta envuelta en un HTTP 200 OK
-        return ResponseEntity.ok(as.login(req)); 
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequest req) {
+        return ResponseEntity.ok(as.login(req));
     }
 }
